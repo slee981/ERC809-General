@@ -39,7 +39,7 @@ contract GroupOwned {
     * Functions
     ***************************************************/
 
-    /* external */
+    /* external, restricted access */
 
     function addOwners(address[] _owners) external onlyOwners {
         uint256 numOwners = _owners.length;

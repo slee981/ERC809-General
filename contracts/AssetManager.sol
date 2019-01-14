@@ -36,12 +36,26 @@ contract AssetManager is ERC809 {
     * Functions
     ***************************************************/
 
-    function addNewAsset(uint256 _inventory, uint256 _minRentTime)
-        public
+    function addNewAsset(uint256 _inventory)
+        external
         onlyOwners
     {
-        address _newAsset = new Asset(_inventory, _minRentTime);
+        address _newAsset = new Asset(_inventory);
         assets.push(_newAsset);
+    }
+
+    function changeWallet(address _newWalletAddr)
+        external
+        onlyOwners
+    {
+        wallet = _newWalletAddr;
+    }
+
+    function changeID(address _newID)
+        external
+        onlyOwners
+    {
+        identity = _newID;
     }
 
     function getAssets() external view returns (address[]) {
@@ -52,7 +66,7 @@ contract AssetManager is ERC809 {
         return wallet;
     }
 
-    function getIdentity() external view returns (address) {
+    function getID() external view returns (address) {
         return identity;
     }
 }

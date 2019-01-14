@@ -11,17 +11,11 @@ contract Asset is RentableAsset {
     /**************************************************
     * Constructor
     ***************************************************/
-    constructor(uint256 _inventory, uint256 _minRentTime)
-        RentableAsset(_inventory, _minRentTime)
+    constructor(uint256 _inventory)
+        RentableAsset(_inventory)
         public {}
 
     /**************************************************
     * Functions
     ***************************************************/
-    function changeInventory(uint256 _newInventory)
-        external
-        onlyManager
-    {
-        inventory = _newInventory;
-    }
 }

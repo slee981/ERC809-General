@@ -7,7 +7,6 @@ contract RentableAsset {
     ***************************************************/
     address assetManager;
     uint256 inventory;
-    uint256 minRentTime;      
 
     ReservationKey[] reservations;
 
@@ -21,10 +20,9 @@ contract RentableAsset {
     /**************************************************
     * Constructor
     ***************************************************/
-    constructor(uint256 _inventory, uint256 _minRentTime) internal {
+    constructor(uint256 _inventory) internal {
         assetManager = msg.sender;
         inventory = _inventory;
-        minRentTime = _minRentTime;
     }
 
     /**************************************************
@@ -51,6 +49,32 @@ contract RentableAsset {
         );
 
         reservations.push(_reservationKey);
+    }
+
+    function endReservation(address _reservation)
+        public
+        onlyManager
+        returns (bool)
+    {
+        uint256 numReservations = reservations.length;
+        ReservationKey memory _reservationKey;
+
+        for (uint256 i=0; i<numReservations; i++) {
+            _reservationKey = reservations[i];
+
+            if (_reservationKey.reservation == _reservation) {
+                _remove(i, reservations);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function changeInventory(uint256 _newInventory)
+        external
+        onlyManager
+    {
+        inventory = _newInventory;
     }
 
     function hasAvailability(uint256 _start, uint256 _stop)
@@ -112,12 +136,49 @@ contract RentableAsset {
         return assetManager;
     }
 
-    /* TODO:
-    function removeReservation(address _reservation) public onlyManager;
-    */
+    function getNumReservations() external view returns (uint256) {
+        return reservations.length;
+    }
+
+    function getReservations(address _renter)
+        external
+        view
+        returns (address[])
+    {
+        uint256 numReservations = reservations.length;
+        address[] memory _reservations = new address[](numReservations);
+
+        ReservationKey memory _reservationKey;
+        address _res;
+        uint256 _count = 0;
+
+        for (uint256 i=0; i<numReservations; i++) {
+            _reservationKey = reservations[i];
+
+            if (_renter == _reservationKey.renter) {
+                _res = _reservationKey.reservation;
+                _reservations[_count] = _res;
+                _count ++;
+            }
+        }
+        return _reservations;
+    }
 
     // helper for testing
     function getTime() external view returns (uint256) {
         return now;
+    }
+
+    function _remove(uint256 _index, ReservationKey[] storage _reservations)
+        internal
+    {
+        uint256 numReservations = _reservations.length;
+        require(_index < numReservations && _index >= 0);
+
+        for (uint256 i = _index; i<numReservations-1; i++){
+            _reservations[i] = _reservations[i+1];
+        }
+        delete _reservations[numReservations-1];
+        _reservations.length--;
     }
 }
